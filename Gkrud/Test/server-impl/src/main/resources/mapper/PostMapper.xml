@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.serverimpl.mapper.PostMapper">
+
+    <resultMap id="PostResultMap" type="com.example.serverimpl.dto.PostDTO">
+        <id     property="id"        column="id"/>
+        <result property="userId"    column="user_id"/>
+        <result property="title"     column="title"/>
+        <result property="content"   column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="username"  column="username"/>
+    </resultMap>
+
+    <insert id="create"
+            parameterType="com.example.serverimpl.dto.PostDTO"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts(user_id, title, content)
+        VALUES (#{userId}, #{title}, #{content})
+    </insert>
+
+    <select id="findAll"
+            parameterType="int"
+            resultMap="PostResultMap">
+        SELECT p.id,
+               p.user_id,
+               p.title,
+               p.content,
+               p.created_at,
+               p.updated_at,
+               u.username
+        FROM posts p
+                 JOIN users u ON p.user_id = u.id
+        ORDER BY p.created_at DESC
+            LIMIT #{offset}, 10
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM posts
+    </select>
+
+    <select id="findById"
+            parameterType="int"
+            resultMap="PostResultMap">
+        SELECT p.id,
+               p.user_id,
+               p.title,
+               p.content,
+               p.created_at,
+               p.updated_at,
+               u.username
+        FROM posts p
+                 JOIN users u ON p.user_id = u.id
+        WHERE p.id = #{id}
+    </select>
+
+    <update id="update"
+            parameterType="com.example.serverimpl.dto.PostDTO">
+        UPDATE posts
+        SET title   = #{title},
+            content = #{content}
+        WHERE id = #{id}
+          AND user_id = #{userId}
+    </update>
+
+    <delete id="delete" parameterType="map">
+        DELETE FROM posts
+        WHERE id      = #{id}
+          AND user_id = #{userId}
+    </delete>
+
+</mapper>
